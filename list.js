@@ -265,8 +265,7 @@ function prepareTable(info) {
   var files = info.directories.concat(info.files), prefix = info.prefix;
   var cols = [45, 30, 15];
   var content = [];
-  content.push(padRight('Last Modified', cols[1]) + '  ' +
-               padRight('Size', cols[2]) + 'Key \n');
+  content.push('Version\n');
   content.push(new Array(cols[0] + cols[1] + cols[2] + 4).join('-') + '\n');
 
   // add ../ at the start of the dir listing, unless we are already at root dir
@@ -289,18 +288,10 @@ function prepareTable(info) {
     // strip off the prefix
     item.keyText = item.Key.substring(prefix.length);
     if (item.Type === 'directory') {
-      if (S3BL_IGNORE_PATH) {
-        item.href = location.protocol + '//' + location.hostname +
-                    location.pathname + '?prefix=' + encodePath(item.Key);
-      } else {
-        item.href = encodePath(item.keyText);
-      }
-    } else {
-      item.href = BUCKET_WEBSITE_URL + '/' + encodePath(item.Key);
-    }
-    var row = renderRow(item, cols);
-    if (!EXCLUDE_FILE.includes(item.Key))
+      item.href = BUCKET_WEBSITE_URL + '/' + encodePath(item.Key) + 'index.html';
+      var row = renderRow(item, cols);
       content.push(row + '\n');
+    } 
   });
 
   return content.join('');
@@ -313,8 +304,6 @@ function encodePath(path) {
 
 function renderRow(item, cols) {
   var row = '';
-  row += padRight(item.LastModified, cols[1]) + '  ';
-  row += padRight(item.Size, cols[2]);
   row += '<a href="' + item.href + '">' + item.keyText + '</a>';
   return row;
 }
